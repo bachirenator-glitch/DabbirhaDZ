@@ -32,13 +32,25 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
 
+          # Fix Surface import position
           p = Path("app/src/main/java/dz/dabbirha/app/MainActivity.kt")
           s = p.read_text()
 
-          if "import androidx.compose.material3.Surface" not in s:
-              s = "import androidx.compose.material3.Surface\n" + s
-              p.write_text(s)
+          import_line = "import androidx.compose.material3.Surface"
 
+          if import_line not in s:
+              lines = s.splitlines()
+              insert_at = 0
+
+              for i, line in enumerate(lines):
+                  if line.startswith("package "):
+                      insert_at = i + 1
+                      break
+
+              lines.insert(insert_at, import_line)
+              p.write_text("\n".join(lines) + "\n")
+
+          # Fix Java/Kotlin JVM target
           g = Path("app/build.gradle.kts")
           s = g.read_text()
 
