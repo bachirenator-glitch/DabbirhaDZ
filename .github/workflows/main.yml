@@ -42,19 +42,9 @@ jobs:
           g = Path("app/build.gradle.kts")
           s = g.read_text()
 
-          s += """
+          if "jvmToolchain(17)" not in s:
+              s += "\n\nkotlin { jvmToolchain(17) }\n"
 
-kotlin {
-    jvmToolchain(17)
-}
-
-android {
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
-"""
           g.write_text(s)
           PY
 
