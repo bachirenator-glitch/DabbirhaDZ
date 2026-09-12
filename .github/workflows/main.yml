@@ -1,0 +1,38 @@
+name: Build Dabbirha DZ APK
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download project
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Extract project
+        run: |
+          unzip -q DabbirhaDZ_PHONE_BUILD.zip -d source
+
+      - name: Build APK
+        working-directory: source/DabbirhaDZ
+        run: gradle assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DabbirhaDZ-APK
+          path: source/DabbirhaDZ/app/build/outputs/apk/debug/app-debug.apk
